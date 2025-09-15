@@ -215,6 +215,18 @@ class TestCrossTypeConversions:
         data = json.loads(response.data)
         assert data['result'] == '10'
         assert data['error'] is None
+
+        # Test bug
+        response = client.post('/convert', 
+                             data=json.dumps({
+                                 'input': 'forty two',
+                                 'inputType': 'text',
+                                 'outputType': 'decimal'
+                             }),
+                             content_type='application/json')
+        data = json.loads(response.data)
+        assert data['result'] == '42'
+        assert data['error'] is None
     
     def test_binary_to_text(self):
         """Test binary to text conversion"""
