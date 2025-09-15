@@ -44,3 +44,9 @@ out of the box.
 Just Add New... > Project, import the Git repository, and off you go.
 Note that Vercel's Hobby plan means your private repository needs to be
 in your personal GitHub account, not the organizational account.
+
+# Bug Fix
+
+- The text_to_number() function did not handle values outside of 0-10. Using text2digits, I updated the function to handle all English natural language inputs. 
+
+- The base64 functions did not properly handle zero, treating it as 0 bits. The functions were updated to recognize zero values and output the correct conversion. 
