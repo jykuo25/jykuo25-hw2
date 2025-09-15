@@ -9,22 +9,56 @@ app = Flask(__name__)
 def text_to_number(text):
     """Convert English text number to integer"""
     # Remove any non-alphanumeric characters and convert to lowercase
-    text = re.sub(r'[^a-zA-Z\s-]', '', text.lower())
+    text = re.sub(r'[^a-zA-Z\s-]', '', text.lower()).strip()
+    
+    # Check for empty string
+    if not text:
+        raise ValueError("Empty text input")
     
     # Special case for zero
     if text in ['zero', 'nil']:
         return 0
     
-    # Dictionary for special number words
-    number_words = {
-        'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5,
-        'six': 6, 'seven': 7, 'eight': 8, 'nine': 9, 'ten': 10
-    }
-    
-    if text in number_words:
-        return number_words[text]
-    
-    raise ValueError("Unable to convert text to number")
+    try:
+        # Use text2digits library to convert text to number
+        # This handles all number formats including compound numbers like "forty two"
+        t2d = text2digits.Text2Digits()
+        result = t2d.convert(text)
+        
+        # Convert the result to integer
+        return int(result)
+    except Exception:
+        # Fallback to manual parsing for common cases
+        # Dictionary for basic number words (0-19)
+        basic_numbers = {
+            'zero': 0, 'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5,
+            'six': 6, 'seven': 7, 'eight': 8, 'nine': 9, 'ten': 10,
+            'eleven': 11, 'twelve': 12, 'thirteen': 13, 'fourteen': 14, 'fifteen': 15,
+            'sixteen': 16, 'seventeen': 17, 'eighteen': 18, 'nineteen': 19
+        }
+        
+        # Dictionary for tens (20-90)
+        tens = {
+            'twenty': 20, 'thirty': 30, 'forty': 40, 'fifty': 50,
+            'sixty': 60, 'seventy': 70, 'eighty': 80, 'ninety': 90
+        }
+        
+        # Handle hyphenated numbers like "twenty-one"
+        text = text.replace('-', ' ').replace(' and ', ' ')
+        words = text.split()
+        
+        if len(words) == 1:
+            # Single word
+            if words[0] in basic_numbers:
+                return basic_numbers[words[0]]
+            elif words[0] in tens:
+                return tens[words[0]]
+        elif len(words) == 2:
+            # Two words - could be "twenty one" or "hundred thousand" etc.
+            if words[0] in tens and words[1] in basic_numbers:
+                return tens[words[0]] + basic_numbers[words[1]]
+        
+        raise ValueError("Unable to convert text to number")
 
 def number_to_text(number):
     """Convert integer to English text"""

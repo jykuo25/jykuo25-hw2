@@ -42,9 +42,7 @@ class TestNumberConversionFunctions:
         with pytest.raises(ValueError, match="Unable to convert text to number"):
             text_to_number("invalid")
         with pytest.raises(ValueError, match="Unable to convert text to number"):
-            text_to_number("eleven")
-        with pytest.raises(ValueError, match="Unable to convert text to number"):
-            text_to_number("twenty")
+            text_to_number("cat")
     
     def test_number_to_text_basic(self):
         """Test basic number to text conversions"""
